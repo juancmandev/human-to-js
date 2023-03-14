@@ -10,8 +10,6 @@ const convertToJSCode = async (
     jsObject && `Use this object as reference: ${jsObject}`
   }, just the code, without explanations or comments`;
 
-  console.log('prompt', prompt);
-
   const response = await fetch('https://api.openai.com/v1/completions', {
     method: 'POST',
     headers: {
@@ -31,8 +29,6 @@ const convertToJSCode = async (
   });
 
   const data = await response.json();
-
-  console.log(data);
 
   if (!response.ok) throw new Error(data.error || 'Error translating to SQL.');
 
