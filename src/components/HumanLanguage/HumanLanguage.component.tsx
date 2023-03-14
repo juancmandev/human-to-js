@@ -17,6 +17,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { Form, FormSection } from './HumanLanguage.styles';
+import { paletteColor } from '@/styles/theme';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -101,7 +102,11 @@ const HumanLanguage = () => {
 
   return (
     <>
-      <Paper sx={{ maxWidth: '400px', p: 4 }}>
+      <Paper
+        sx={{
+          maxWidth: '400px',
+          p: 4,
+        }}>
         <Typography variant='h6' sx={{ fontWeight: '600' }}>
           Human to JavaScript
         </Typography>

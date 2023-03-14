@@ -4,6 +4,7 @@ import { CacheProvider } from '@emotion/react';
 import { ThemeProvider } from '@mui/material';
 import createCache from '@emotion/cache';
 import { theme } from '@/styles/theme';
+import Main from '@/layouts/Main.layout';
 
 export const createEmotionCache = () => {
   return createCache({ key: 'css', prepend: true });
@@ -17,7 +18,9 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <CacheProvider value={emotionCache}>
       <ThemeProvider theme={theme}>
-        <Component {...pageProps} />
+        <Main>
+          <Component {...pageProps} />
+        </Main>
       </ThemeProvider>
     </CacheProvider>
   );

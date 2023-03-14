@@ -9,9 +9,9 @@ export default function Home() {
       <Box
         sx={{
           width: '100%',
-          padding: '60px 20px',
+          padding: '80px 10px 40px',
           display: 'grid',
-          placeItems: 'center',
+          justifyContent: 'center',
         }}>
         <HumanLanguage />
       </Box>

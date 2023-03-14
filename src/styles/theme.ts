@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material';
 
-const paletteColor = {
+export const paletteColor = {
   primary: {
     main: '#f7df1e',
     light: '##f8e246',
@@ -11,6 +11,7 @@ const paletteColor = {
     main: '#434343',
     light: '#555555',
     dark: '#262626',
+    contrastText: '#fff',
   },
 };
 
