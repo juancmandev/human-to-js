@@ -9,7 +9,7 @@ export default function Home() {
       <Box
         sx={{
           width: '100%',
-          padding: '80px 10px 40px',
+          padding: '60px 10px 40px',
           display: 'grid',
           justifyContent: 'center',
         }}>
