@@ -35,9 +35,6 @@ export default function Home() {
 
   return (
     <>
-      <Head>
-        <title>Human to JavaScript</title>
-      </Head>
       <SEO />
       <Box
         sx={{
