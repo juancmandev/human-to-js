@@ -1,4 +1,5 @@
 import { useState, SyntheticEvent } from 'react';
+import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import {
   Button,
@@ -17,29 +18,35 @@ import {
 } from '@mui/material';
 import { Form, FormSection } from './HumanLanguage.styles';
 import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import spinner from '../../assets/spinner.gif';
 
 const SyntaxHighLighter = dynamic(() => import('react-syntax-highlighter'));
 
 const functionSyntaxValues = ['Arrow Function', 'Simple Function'];
 
-const codeExample = `const filteredItems = items.filter(item => item.zone === userZone && item.available);`;
-
 const HumanLanguage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [copyTooltip, setCopyTooltip] = useState('Copy to clipboard');
   const [generatedText, setGeneratedText] = useState('');
 
+  const validationSchema = () => ({
+    humanQuery: Yup.string().required('You need to describe what do you want.'),
+  });
+
   const formik = useFormik({
     initialValues: {
-      jsObject: '',
       humanQuery: '',
+      jsObject: '',
       functionSyntax: functionSyntaxValues[0],
     },
     initialErrors: {},
+    validationSchema: Yup.object(validationSchema()),
     onSubmit: () => {
-      setHasSubmitted(true);
+      setSubmitting(true);
       handleRequest();
     },
   });
@@ -59,7 +66,10 @@ const HumanLanguage = () => {
     if (response.ok) {
       const data = await response.json();
 
+      setSubmitting(false);
       setGeneratedText(data.outputText);
+    } else {
+      setSubmitting(false);
     }
   };
 
@@ -78,19 +88,55 @@ const HumanLanguage = () => {
     setCopyTooltip('Copied!');
   };
 
+  const handleClear = () => {
+    formik.resetForm();
+    setOpenSnackbar(true);
+    setSubmitting(false);
+    setHasSubmitted(false);
+    setGeneratedText('');
+  };
+
   const handleMouseLeaveCopy = () =>
     setTimeout(() => setCopyTooltip('Copy to clipboard'), 100);
 
   return (
     <>
-      <Paper sx={{ p: 4 }}>
+      <Paper sx={{ maxWidth: '400px', p: 4 }}>
         <Typography variant='h6' sx={{ fontWeight: '600' }}>
-          Human to JavaScript Array Methods
+          Human to JavaScript
         </Typography>
         <Form onSubmit={formik.handleSubmit}>
           <FormSection>
+            <FormLabel
+              error={
+                formik.touched.humanQuery && Boolean(formik.errors.humanQuery)
+              }
+              sx={{
+                fontWeight: '600',
+              }}
+              htmlFor='humanQuery'>
+              Human Language Problem Description *
+            </FormLabel>
+            <TextField
+              id='humanQuery'
+              fullWidth
+              multiline
+              rows={4}
+              placeholder={`Ex: Filter by zone and only the zones that starts with 'a'`}
+              value={formik.values.humanQuery}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.humanQuery && Boolean(formik.errors.humanQuery)
+              }
+              helperText={formik.touched.humanQuery && formik.errors.humanQuery}
+            />
+          </FormSection>
+
+          {/* I don't know if this field is necessary */}
+
+          {/* <FormSection>
             <FormLabel sx={{ fontWeight: '600' }} htmlFor='jsObject'>
-              JavaScript Object
+              JavaScript Object (Optional)
             </FormLabel>
             <TextField
               id='jsObject'
@@ -101,21 +147,8 @@ const HumanLanguage = () => {
               value={formik.values.jsObject}
               onChange={formik.handleChange}
             />
-          </FormSection>
-          <FormSection>
-            <FormLabel sx={{ fontWeight: '600' }} htmlFor='humanQuery'>
-              Human Language Problem Description
-            </FormLabel>
-            <TextField
-              id='humanQuery'
-              fullWidth
-              multiline
-              rows={2}
-              placeholder={`Ex: Filter by zone and only the zones that starts with 'a'`}
-              value={formik.values.humanQuery}
-              onChange={formik.handleChange}
-            />
-          </FormSection>
+          </FormSection> */}
+
           <FormSection>
             <FormLabel sx={{ fontWeight: '600' }} htmlFor='human-query'>
               Function Syntax
@@ -132,26 +165,32 @@ const HumanLanguage = () => {
               ))}
             </Select>
           </FormSection>
+
           <FormSection>
             <Button
               type='submit'
-              sx={{ textTransform: 'capitalize', fontSize: '1.1rem' }}
+              disabled={submitting}
+              sx={{
+                textTransform: 'capitalize',
+                fontSize: '1.1rem',
+                minWidth: '100%',
+              }}
               variant='contained'>
-              Generate Code
+              {submitting ? (
+                <Image width={30} height={30} src={spinner} alt='Spinner' />
+              ) : (
+                'Generate Code'
+              )}
             </Button>
             <Button
-              onClick={() => {
-                formik.resetForm();
-                setOpenSnackbar(true);
-                setHasSubmitted(false);
-              }}
+              onClick={handleClear}
               sx={{ textTransform: 'capitalize', fontSize: '1.1rem' }}
               variant='outlined'>
               Clear
             </Button>
           </FormSection>
         </Form>
-        <Collapse in={hasSubmitted}>
+        <Collapse in={Boolean(generatedText)}>
           <Box>
             <Box
               sx={{
@@ -180,7 +219,7 @@ const HumanLanguage = () => {
               wrapLines={true}
               lineProps={{ style: { whiteSpace: 'pre-wrap' } }}
               customStyle={{
-                maxWidth: '375px',
+                maxWidth: '400px',
                 maxHeight: 'none',
                 height: 'auto',
                 overflow: 'visible',

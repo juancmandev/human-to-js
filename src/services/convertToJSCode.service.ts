@@ -6,9 +6,9 @@ const convertToJSCode = async (
   apiKey: any,
   jsObject?: string
 ) => {
-  const prompt = `Translate this natural language query: "${query}" just using JavaScript with ${functionSyntax} syntax ${
+  const prompt = `Translate this natural language query: "${query}" using JavaScript with ${functionSyntax} syntax ${
     jsObject && `Use this object as reference: ${jsObject}`
-  }, I just want the code, without explanations or comments`;
+  }, just the code, without explanations or comments`;
 
   console.log('prompt', prompt);
 

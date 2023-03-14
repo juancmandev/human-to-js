@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const Form = styled.form`
   margin: 20px 0;
   display: grid;
-  row-gap: 20px;
+  row-gap: 16px;
 `;
 
 export const FormSection = styled.section`

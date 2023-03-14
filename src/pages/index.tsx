@@ -1,3 +1,5 @@
+'use client';
+
 import { Box } from '@mui/material';
 import HumanLanguage from '@/components/HumanLanguage/HumanLanguage.component';
 
