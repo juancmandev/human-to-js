@@ -17,12 +17,11 @@ import {
 } from '@mui/material';
 import { Form, FormSection } from './HumanLanguage.styles';
 import { useFormik } from 'formik';
-import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 const SyntaxHighLighter = dynamic(() => import('react-syntax-highlighter'));
 
-const codeSyntaxValues = ['Arrow Function', 'Simple Function'];
+const functionSyntaxValues = ['Arrow Function', 'Simple Function'];
 
 const codeExample = `const filteredItems = items.filter(item => item.zone === userZone && item.available);`;
 
@@ -30,19 +29,39 @@ const HumanLanguage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [copyTooltip, setCopyTooltip] = useState('Copy to clipboard');
+  const [generatedText, setGeneratedText] = useState('');
 
   const formik = useFormik({
     initialValues: {
       jsObject: '',
       humanQuery: '',
-      codeSyntax: codeSyntaxValues[0],
+      functionSyntax: functionSyntaxValues[0],
     },
     initialErrors: {},
-    onSubmit: (values) => {
+    onSubmit: () => {
       setHasSubmitted(true);
-      console.log(values);
+      handleRequest();
     },
   });
+
+  const handleRequest = async () => {
+    const requestBody = {
+      query: formik.values.humanQuery,
+      functionSyntax: formik.values.functionSyntax,
+      jsObject: formik.values.jsObject,
+    };
+
+    const response = await fetch('/api/convert', {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      setGeneratedText(data.outputText);
+    }
+  };
 
   const handleCloseSnackbar = (
     event: SyntheticEvent | Event,
@@ -99,14 +118,14 @@ const HumanLanguage = () => {
           </FormSection>
           <FormSection>
             <FormLabel sx={{ fontWeight: '600' }} htmlFor='human-query'>
-              Code Syntax
+              Function Syntax
             </FormLabel>
             <Select
-              id='codeSyntax'
-              name='codeSyntax'
-              value={formik.values.codeSyntax}
+              id='functionSyntax'
+              name='functionSyntax'
+              value={formik.values.functionSyntax}
               onChange={formik.handleChange}>
-              {codeSyntaxValues.map((option) => (
+              {functionSyntaxValues.map((option) => (
                 <MenuItem key={option} value={option}>
                   {option}
                 </MenuItem>
@@ -116,7 +135,6 @@ const HumanLanguage = () => {
           <FormSection>
             <Button
               type='submit'
-              disabled={hasSubmitted}
               sx={{ textTransform: 'capitalize', fontSize: '1.1rem' }}
               variant='contained'>
               Generate Code
@@ -159,7 +177,6 @@ const HumanLanguage = () => {
             </Box>
             <SyntaxHighLighter
               language='javascript'
-              style={docco}
               wrapLines={true}
               lineProps={{ style: { whiteSpace: 'pre-wrap' } }}
               customStyle={{
@@ -169,7 +186,7 @@ const HumanLanguage = () => {
                 overflow: 'visible',
                 wordWrap: 'break-word',
               }}>
-              {codeExample}
+              {generatedText}
             </SyntaxHighLighter>
           </Box>
         </Collapse>
