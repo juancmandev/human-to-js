@@ -1,7 +1,4 @@
-'use client';
-
 import { Box } from '@mui/material';
-import Head from 'next/head';
 import HumanLanguage from '@/components/HumanLanguage/HumanLanguage.component';
 import { NextSeo } from 'next-seo';
 
