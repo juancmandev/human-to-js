@@ -17,7 +17,6 @@ import {
   IconButton,
 } from '@mui/material';
 import { Form, FormSection } from './HumanLanguage.styles';
-import { paletteColor } from '@/styles/theme';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -30,7 +29,6 @@ const functionSyntaxValues = ['Arrow Function', 'Simple Function'];
 const HumanLanguage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
   const [copyTooltip, setCopyTooltip] = useState('Copy to clipboard');
   const [generatedText, setGeneratedText] = useState('');
 
@@ -93,7 +91,6 @@ const HumanLanguage = () => {
     formik.resetForm();
     setOpenSnackbar(true);
     setSubmitting(false);
-    setHasSubmitted(false);
     setGeneratedText('');
   };
 
@@ -105,7 +102,7 @@ const HumanLanguage = () => {
       <Paper
         sx={{
           maxWidth: '400px',
-          p: 4,
+          p: { xs: '8px 12px', sm: 4 },
         }}>
         <Typography variant='h6' sx={{ fontWeight: '600' }}>
           Human to JavaScript
