@@ -184,7 +184,11 @@ const HumanLanguage = () => {
             </Button>
             <Button
               onClick={handleClear}
-              sx={{ textTransform: 'capitalize', fontSize: '1.1rem' }}
+              color='secondary'
+              sx={{
+                textTransform: 'capitalize',
+                fontSize: '1.1rem',
+              }}
               variant='outlined'>
               Clear
             </Button>
