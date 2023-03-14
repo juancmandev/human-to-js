@@ -73,7 +73,7 @@ const HumanLanguage = () => {
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(codeExample);
+    navigator.clipboard.writeText(generatedText);
 
     setCopyTooltip('Copied!');
   };
