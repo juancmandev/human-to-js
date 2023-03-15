@@ -1,5 +1,6 @@
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
+import { Analytics } from '@vercel/analytics/react';
 import { CacheProvider } from '@emotion/react';
 import { ThemeProvider } from '@mui/material';
 import createCache from '@emotion/cache';
@@ -20,6 +21,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <ThemeProvider theme={theme}>
         <Main>
           <Component {...pageProps} />
+          <Analytics />
         </Main>
       </ThemeProvider>
     </CacheProvider>
