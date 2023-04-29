@@ -21,16 +21,21 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import spinner from '../../assets/spinner.gif';
+import { Configuration, OpenAIApi } from 'openai';
 
 const SyntaxHighLighter = dynamic(() => import('react-syntax-highlighter'));
 
 const functionSyntaxValues = ['Arrow Function', 'Simple Function'];
 
+const openAIKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY as string;
+const openAIOrganizationKey = process.env
+  .NEXT_PUBLIC_OPENAI_ORGANIZATION_KEY as string;
+
 const HumanLanguage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [copyTooltip, setCopyTooltip] = useState('Copy to clipboard');
-  const [generatedText, setGeneratedText] = useState('');
+  const [generatedText, setGeneratedText] = useState<string | undefined>('');
 
   const validationSchema = () => ({
     humanQuery: Yup.string().required('You need to describe what do you want.'),
@@ -44,32 +49,42 @@ const HumanLanguage = () => {
     },
     initialErrors: {},
     validationSchema: Yup.object(validationSchema()),
-    onSubmit: () => {
+    onSubmit: ({ humanQuery, functionSyntax, jsObject }) => {
       setSubmitting(true);
-      handleRequest();
+      handleRequest({ humanQuery, functionSyntax, jsObject });
     },
   });
 
-  const handleRequest = async () => {
-    const requestBody = {
-      query: formik.values.humanQuery,
-      functionSyntax: formik.values.functionSyntax,
-      jsObject: formik.values.jsObject,
-    };
+  const handleRequest = async ({
+    humanQuery,
+    functionSyntax,
+    jsObject,
+  }: any) => {
+    const prompt = `Translate this natural language query: "${humanQuery}" using JavaScript with ${functionSyntax} syntax ${
+      jsObject && `Use this object as reference: ${jsObject}`
+    }, just the code, without explanations or comments`;
 
-    const response = await fetch('/api/convert', {
-      method: 'POST',
-      body: JSON.stringify(requestBody),
+    const configuration = new Configuration({
+      organization: openAIOrganizationKey,
+      apiKey: openAIKey,
+    });
+    const openAI = new OpenAIApi(configuration);
+
+    const response = await openAI.createCompletion({
+      prompt: prompt,
+      model: 'text-davinci-003',
+      temperature: 0.5,
+      max_tokens: 2000,
+      frequency_penalty: 0.5,
+      presence_penalty: 0.5,
     });
 
-    if (response.ok) {
-      const data = await response.json();
+    if (response) {
+      const data = response.data.choices[0].text;
 
       setSubmitting(false);
-      setGeneratedText(data.outputText);
-    } else {
-      setSubmitting(false);
-    }
+      setGeneratedText(data);
+    } else setSubmitting(false);
   };
 
   const handleCloseSnackbar = (
@@ -82,9 +97,11 @@ const HumanLanguage = () => {
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(generatedText);
+    if (generatedText) {
+      navigator.clipboard.writeText(generatedText);
 
-    setCopyTooltip('Copied!');
+      setCopyTooltip('Copied!');
+    }
   };
 
   const handleClear = () => {
@@ -220,19 +237,21 @@ const HumanLanguage = () => {
                 </IconButton>
               </Tooltip>
             </Box>
-            <SyntaxHighLighter
-              language='javascript'
-              wrapLines={true}
-              lineProps={{ style: { whiteSpace: 'pre-wrap' } }}
-              customStyle={{
-                maxWidth: '400px',
-                maxHeight: 'none',
-                height: 'auto',
-                overflow: 'visible',
-                wordWrap: 'break-word',
-              }}>
-              {generatedText}
-            </SyntaxHighLighter>
+            {generatedText && (
+              <SyntaxHighLighter
+                language='javascript'
+                wrapLines={true}
+                lineProps={{ style: { whiteSpace: 'pre-wrap' } }}
+                customStyle={{
+                  maxWidth: '400px',
+                  maxHeight: 'none',
+                  height: 'auto',
+                  overflow: 'visible',
+                  wordWrap: 'break-word',
+                }}>
+                {generatedText}
+              </SyntaxHighLighter>
+            )}
           </Box>
         </Collapse>
       </Paper>
