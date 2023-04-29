@@ -32,6 +32,9 @@ const openAIOrganizationKey = process.env
   .NEXT_PUBLIC_OPENAI_ORGANIZATION_KEY as string;
 
 const HumanLanguage = () => {
+  console.log(openAIKey);
+  console.log(openAIOrganizationKey);
+
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [copyTooltip, setCopyTooltip] = useState('Copy to clipboard');
